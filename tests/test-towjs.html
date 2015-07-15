@@ -1,0 +1,117 @@
+<!-- Copyright 2014, SRI International -->
+<html>
+  <script src="/js/three.js"></script>
+  <script src="/js/ColladaLoader.js"></script>
+  <script src="/js/tween.min.js"></script>
+  <script src="/js/tow.js"></script>
+  <script src="/js/dat.gui.min.js"></script>
+  <script>
+TOW.loadCollada('/SAVE/models/xyzbar.dae', function() {
+  $xyzbar_dae.scale.set(0.005, 0.005, 0.005);
+  TOW.render();
+});
+TOW.loadColladas([ '/SAVE/models/environments/range/ShootingRange.dae', '/SAVE/models_lowpolygon/M4_lowPoly_06.dae' ], function() { onloadTowDatGui(); });
+TOW.intow(-1, 0.5, 0.5, -0.25, 0.025, 0.25); // light, camera => x, y, z
+  </script>
+
+  <script>
+var TowDatMenu = function() {
+  var self = this;
+  var n;
+
+  this.meshCache = { }; // mesh references by name
+  this.targets = function() {
+    n = 'targets';
+    focusSelected($ShootingRange_dae);
+  };
+  this.ShootingRangeArea8 = function() {
+    n = 'ShootingRangeArea8';
+    focusSelected($ShootingRange_dae);
+  };
+  this.ShootingRangeArea = function() {
+    n = 'ShootingRangeArea1';
+    focusSelected($ShootingRange_dae);
+    n = 'ShootingRangeArea2';
+    focusSelected($ShootingRange_dae);
+  };
+  this.Trigger = function() {
+    n = 'Trigger';
+    focusTriggerTween($M4_lowPoly_06_dae);
+  };
+  this.Selector_Lever = function() {
+    n = 'Selector_Lever';
+    focusSelected($M4_lowPoly_06_dae);
+  };
+  this.Gun_Carrying_Handle = function() {
+    n = 'Gun_Carrying_Handle';
+    focusSelected($M4_lowPoly_06_dae);
+  };
+
+  function focusSelected(dae, onRender) {
+    var logged = false;
+
+    onRender = onRender || function(delta, pivot) {
+      if (!logged) { console.log(pivot.children[ 0 ].matrix.elements); logged = true; } // log the offset matrix
+
+      pivot.rotation.y += 0.005;
+    };
+
+    if (self.meshCache[ n ] === undefined) self.meshCache[ n ] = TOW.findMeshVisibleAndCenterRender(n, dae, onRender);
+  }
+
+  function focusTriggerTween(dae) {
+    var pivot;
+
+    if (self.meshCache[ n ] === undefined) {
+      var pivot =  self.meshCache[ n ] = TOW.findMeshAndVisibleMesh(n, dae); // trigger has local transform, "pivot" point, not at world 0, 0, 0
+
+      TOW.render(function(delta) { pivot.rotation.y += Math.PI * delta; });
+    } else {
+      return;
+    }
+
+    pivot.position.set(0, 0, 0);
+
+    var curZ = { z:  pivot.rotation.z };
+    var pull = new TWEEN.Tween(curZ)
+      .to({ z: 0.52 }, 1000) // radians and milliseconds
+      // .easing(TWEEN.Easing.Elastic.InOut)
+      .easing(TWEEN.Easing.Exponential.InOut)
+      .onUpdate(function() { curZ = pivot.rotation.z = -this.z; });
+    var release = new TWEEN.Tween(curZ)
+      .to({ z: 0 }, 500)
+      .onUpdate(function() { curZ =  pivot.rotation.z = -this.z })
+      .delay(250);
+
+    pull.chain(release);
+    release.chain(pull);
+    pull.start();
+  }
+};
+
+// window.onload =
+function onloadTowDatGui() {
+  var towDatMenu = new TowDatMenu();
+  var towDatGUI = new dat.GUI();
+  var lookAt = new THREE.Vector3();
+
+  towDatGUI.add(TOW.Camera.position, 'x', -10, 10).step(0.01);
+  towDatGUI.add(TOW.Camera.position, 'y', -10, 10).step(0.01);
+  towDatGUI.add(TOW.Camera.position, 'z', -10, 10).step(0.01);
+  towDatGUI.add(lookAt, 'x').name('lookX').onChange(function() { TOW.Camera.lookAt(lookAt); });
+  towDatGUI.add(lookAt, 'y').name('lookY').onChange(function() { TOW.Camera.lookAt(lookAt); });
+  towDatGUI.add(lookAt, 'z').name('lookZ').onChange(function() { TOW.Camera.lookAt(lookAt); });
+  towDatGUI.add(TOW, 'cancelOnRenders');
+  towDatGUI.add(TOW, 'cancelRender');
+
+  towDatGUI.add(towDatMenu, 'targets');
+  towDatGUI.add(towDatMenu, 'ShootingRangeArea');
+  towDatGUI.add(towDatMenu, 'ShootingRangeArea8');
+  towDatGUI.add(towDatMenu, 'Trigger');
+  towDatGUI.add(towDatMenu, 'Selector_Lever');
+  towDatGUI.add(towDatMenu, 'Gun_Carrying_Handle');
+}
+  </script>
+<body>
+</body>
+</html>
