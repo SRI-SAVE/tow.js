@@ -1,4 +1,18 @@
-// Copyright 2014, SRI International
+/*
+Copyright 2016 SRI International
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 // tow.js
 // dependencies: three.js https://github.com/mrdoob/three.js
 //               tween.js https://github.com/sole/tween.js (optional)
@@ -166,7 +180,7 @@ TOW.loadCollada = function(url, onLoad, visible, rootName) {
     collada.scene.name = rootName;
     TOW.Scene.add(collada.scene);
     eval('$' + rootName + ' = collada.scene');
-    
+
     if (!visible) TOW.invisibleSceneChildren(collada.scene);
     if (onLoad !== undefined) onLoad(collada.scene);
   });
@@ -335,7 +349,7 @@ TOW.render = function(onRender) {
 
     TOW._onRenders.forEach(function(r) { r(delta); });
     TOW.Renderer.render(TOW.Scene, TOW.Camera);
-    
+
     if (TOW.TWEEN) TWEEN.update();
   };
 

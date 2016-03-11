@@ -1,0 +1,9 @@
+Copyright 2016 SRI International
+
+This work is supported by the Advanced Distributed Learning Initiative (ADL) 
+under Contract No. W911QY-14-C-0023. The United States Government retains 
+unlimited rights (See DFARS 252.227-7013 and 7014) to the software and 
+technical data developed under the contract that are not otherwise designated 
+as "special works" by the Contracting Officer, with "special works" as 
+defined by DFARS 252.227-7020.
+
